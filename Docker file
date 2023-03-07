@@ -1,0 +1,59 @@
+FROM ubuntu:18.04
+
+ENV DEBIAN_FRONTEND=non-interactive
+# Install dependencies
+RUN apt-get update -y
+RUN apt-get install -y git curl apache2 php libapache2-mod-php php-mysql
+
+# Install app
+RUN rm -rf /var/www/html/*
+ADD src /var/www/html/
+
+# Configure apache
+RUN a2enmod rewrite
+RUN chown -R www-data:www-data /var/www/html
+ENV APACHE_RUN_DIR /var/www/html
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+
+
+EXPOSE 80
+
+CMD ["/usr/sbin/apache2", "-D",  "FOREGROUND"]
+
+
+JankinsFile
+
+node {
+ 
+  stage('Checkout Source Code') {
+    checkout scm
+  }
+
+  stage('Create Docker Image') {
+    docker.build("docker_image:${env.BUILD_NUMBER}")
+  }
+
+  stage ('Run Application') {
+    try {
+      // Stop existing Container
+      sh 'docker rm docker_container -f'
+      // Start database container here
+      sh "docker run -d --name docker_container docker_image:${env.BUILD_NUMBER}"
+	    //push to docker hub
+	    
+	//sh "docker push nikunj0510/docker_image:${env.BUILD_NUMBER}"
+    } 
+     
+catch (error) {
+    } finally {
+      // Stop and remove database container here
+      
+    }
+  }
+ 
+  
+  
+   
+ }
