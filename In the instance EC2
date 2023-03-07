@@ -1,0 +1,90 @@
+STEP:1 CREATE AWS UBUNTU INSTANCE WITH PORT NO:8080
+
+STEP:2 INSTALL DOCKER
+
+STEP:3 INSTALL JDK
+
+STEP:4 INSTALL MAVEN
+
+STEP:5 INSTALL JENKINS
+
+
+STEP:1 CREATE AWS UBUNTU INSTANCE WITH PORT NO:8080
+> prepare AWS Ubuntu INSTANCE (Ubuntu Server 22.04 LTS (HVM) ,SSD Volume Type)
+> Security : add port no :8080 with custom TCP rule
+
+STEP:2 INSTALL DOCKER
+> sudo apt-get update
+> sudo apt-get install ca-certificates curl gnupg lsb-release
+> sudo mkdir -m 0755 -p /etc/apt/keyrings
+> curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+> echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+> sudo apt-get update
+> sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+1. TO  VERIFY THE INSTALLTION
+> sudo docker -v
+		OUTPUT:Docker version 23.0.1, build a5ee5b1
+
+
+STEP:3 INSTALL JDK
+> sudo apt-get update
+> sudo apt install default-jdk -y to verify the installtion
+> java –version
+
+STEP:4 MAVEN INSTALLION
+> sudo apt-get update
+> sudo apt install maven -y
+
+
+
+
+
+STEP:5 JENKINS INSTALLATION
+
+> curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+> echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+> sudo apt-get update
+> sudo apt-get install Jenkins
+
+1. TO START WITH JENKINS
+> sudo service jenkins start
+> sudo service jenkins status
+CONNECT: GOTO>AWS>EC2>copy public ip address of your instance:8080 on browser and hit enter
+
+2. TO GENERATE SECREAT PASSWORD
+> sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+3. TO GIVE PERMISSION FOR ALL
+> sudo chmod 777 /var/run/docker.sock
+4. FOR INITIAL CREDENTIALS AND BASIC SETUP
+1. CLICK ON INSTALL SUGGESTED PLUGINS
+2. PROVIDE YOUR CREDNTIALS
+3. WELCOME TO JENKINS
+4. MANAGE PLUGINS>INSTALL SUGGESTED PLUGINS>AVAILABLE PLUGINS>MAVEN INTEGRATION >CLICK ON INSTALL WITHOUT RESTART
+
+5.Prepare CI/CD
+Goto>managejenkins>clouds>configure clouds>choose docker
+HOST URI: unix:///var/run/docker.sock 
+Click on test connections
+Click on apply and save
+Goto>dashboard>create>new job>select freestyle project> Give the name as Jenkins CICD Pipeline
+Goto >source code management
+Provide GITHUB Link: https://github.com/som-98/CI_CD.git
+Choose poll SCM In Schedule: H/2 * * * *
+ Build Environment: Choose Build/Publish Image
+
+Build Steps:
+Image: somnathnandi/ci-cd:$user{BUILD_NUMBER}
+
+Click on push image
+ADD click on add icon to add your Docker Hub Login Credentials
+Provide
+1. Username
+2. Password
+3. ID
+From dropdown choose your Credentials
+POST Build Actions
+Click on Apply and Save
+
+Click on build now
+
+	
